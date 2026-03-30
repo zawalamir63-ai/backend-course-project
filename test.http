@@ -1,0 +1,16 @@
+POST http://localhost:3000/questions
+Content-Type: application/json
+
+{
+  "question": "What is 2 + 2?",
+  "answer": "4"
+}
+
+###
+
+POST http://localhost:3000/questions/1/answer
+Content-Type: application/json
+
+{
+  "answer": "4"
+}
