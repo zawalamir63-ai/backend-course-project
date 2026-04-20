@@ -1,21 +1,35 @@
-const express = require('express');
-const questionsRoutes = require('./routes/questions');
+const express = require("express");
 const app = express();
+const postsRouter = require("./routes/posts");
+const prisma = require("./lib/prisma");
+
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use('/questions', questionsRoutes);
-app.get('/', (req, res) => {
-  res.json({ message: 'Hello, World!' });
+app.use("/api/posts", postsRouter);
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ msg: "Not found" });
 });
 
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString()
-  });
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: "Internal server error" });
 });
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+});
+
+// Graceful shutdown
+process.on("SIGINT", async () => {
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+process.on("SIGTERM", async () => {
+  await prisma.$disconnect();
+  process.exit(0);
 });
